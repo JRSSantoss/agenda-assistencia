@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agenda da Assistência Técnica</title>
+  <style>
+    :root{
+      --bg:#f4f6f8;--surface:#fff;--surface2:#f8fafc;--text:#18212f;--muted:#667085;
+      --line:#e4e7ec;--primary:#1f6feb;--primary2:#1759bd;--success:#12b76a;
+      --warning:#f79009;--danger:#d92d20;--purple:#7f56d9;--cyan:#0e9384;
+      --shadow:0 10px 30px rgba(16,24,40,.08);--radius:16px;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+    button,input,select,textarea{font:inherit} button{cursor:pointer}
+    .app{min-height:100vh}.topbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:16px 22px}
+    .topbar-inner{max-width:1600px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .brand h1{font-size:21px;margin:0 0 3px}.brand p{margin:0;color:var(--muted);font-size:13px}
+    .top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 11px;font-size:12px;font-weight:800;color:var(--muted)}
+    .dot{width:8px;height:8px;border-radius:50%;background:#98a2b3}.dot.online{background:var(--success)}.dot.error{background:var(--danger)}
+    .btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:9px 13px;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:700;font-size:13px;transition:.15s}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(16,24,40,.08)}.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary2)}.btn-danger{color:var(--danger)}.btn-icon{width:40px;padding:9px}
+    .container{max-width:1600px;margin:auto;padding:20px 22px 38px}.notice{margin-bottom:14px;padding:10px 13px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--muted);font-size:13px}
+    .summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:14px}.summary-card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px}.summary-card span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;font-weight:800;letter-spacing:.05em}.summary-card strong{display:block;font-size:24px;margin-top:4px}
+    .toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px;flex-wrap:wrap}.date-nav,.view-switch{display:flex;align-items:center;gap:7px}.period-title{min-width:245px;text-align:center;font-size:17px;font-weight:800}.view-switch{background:#e9edf2;border-radius:11px;padding:4px}.view-switch button{border:0;background:transparent;border-radius:8px;padding:7px 13px;font-weight:800;color:var(--muted)}.view-switch button.active{background:#fff;color:var(--text);box-shadow:0 1px 5px rgba(16,24,40,.1)}
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:14px;align-items:start}.calendar-shell,.side-panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .week-grid{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));overflow-x:auto}.day-column{min-width:190px;border-right:1px solid var(--line);background:#fff}.day-column:last-child{border-right:0}.day-column.current{background:linear-gradient(180deg,#f4f9ff 0,#fff 150px)}
+    .day-head{padding:12px 13px;border-bottom:1px solid var(--line);background:#fff}.current .day-head{background:#f4f9ff}.day-name{text-transform:uppercase;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.08em}.day-date{margin-top:3px;font-size:20px;font-weight:900;display:flex;align-items:center;justify-content:space-between}.today-badge{font-size:9px;color:#fff;background:var(--primary);border-radius:999px;padding:4px 7px}
+    .day-body{height:560px;overflow-y:auto;padding:9px;scrollbar-width:thin;scrollbar-color:#c9ced6 transparent}.day-body::-webkit-scrollbar{width:8px}.day-body::-webkit-scrollbar-thumb{background:#c9ced6;border-radius:999px}.empty-day{color:#98a2b3;font-size:12px;padding:13px 7px;text-align:center;border:1px dashed #d0d5dd;border-radius:9px}
+    .appointment{border:1px solid var(--line);border-left:4px solid var(--primary);border-radius:11px;padding:10px;margin-bottom:8px;background:#fff;box-shadow:0 2px 6px rgba(16,24,40,.04);cursor:pointer}.appointment:hover{box-shadow:0 6px 14px rgba(16,24,40,.08)}.appointment[data-type="Treinamento"]{border-left-color:var(--purple)}.appointment[data-type="Instalação"]{border-left-color:var(--success)}.appointment[data-type="Manutenção"]{border-left-color:var(--warning)}.appointment[data-type="Outro"]{border-left-color:var(--cyan)}
+    .appt-top{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:6px}.appt-time{font-size:12px;font-weight:900}.status-dot{width:8px;height:8px;border-radius:50%;background:#98a2b3}.status-dot.confirmado{background:var(--success)}.status-dot.agendado{background:var(--primary)}.status-dot.pendente{background:var(--warning)}.status-dot.cancelado{background:var(--danger)}.status-dot.concluido{background:#344054}.appt-title{font-size:13px;font-weight:900;margin-bottom:4px;line-height:1.25}.appt-meta{display:grid;gap:2px;color:var(--muted);font-size:11px;line-height:1.35}
+    .side-panel{position:sticky;top:92px}.side-head{padding:14px;border-bottom:1px solid var(--line)}.side-head h3{margin:0 0 4px;font-size:15px}.side-head p{margin:0;color:var(--muted);font-size:11px}.unassigned-list{padding:11px;max-height:590px;overflow:auto}.unassigned{padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:7px;background:var(--surface2);cursor:pointer}.unassigned strong{display:block;font-size:12px;margin-bottom:3px}.unassigned small{color:var(--muted);font-size:11px}.side-empty{text-align:center;color:#98a2b3;font-size:12px;padding:20px 8px}
+    .month-grid{display:grid;grid-template-columns:repeat(7,1fr)}.month-weekday{padding:10px;text-align:center;font-size:10px;text-transform:uppercase;font-weight:900;color:var(--muted);border-bottom:1px solid var(--line);background:var(--surface2)}.month-day{min-height:125px;padding:8px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);cursor:pointer}.month-day:nth-child(7n){border-right:0}.month-day.outside{background:#fafafa;color:#b2b8c2}.month-day.today{background:#f4f9ff}.month-number{font-weight:900;font-size:12px;margin-bottom:6px}.month-item{font-size:10px;padding:4px 5px;background:#eef4ff;border-radius:6px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.month-more{font-size:10px;color:var(--muted);font-weight:800}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(16,24,40,.52);display:none;align-items:center;justify-content:center;z-index:100;padding:18px}.modal-backdrop.show{display:flex}.modal{width:min(720px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:17px;box-shadow:0 30px 80px rgba(16,24,40,.28)}.modal.small{width:min(440px,100%)}.modal.wide{width:min(900px,100%)}
+    .modal-header{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;background:#fff;z-index:2}.modal-header h2{margin:0;font-size:18px}.close{border:0;background:transparent;font-size:23px;color:var(--muted)}.modal-body{padding:18px}.modal-footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:9px;position:sticky;bottom:0;background:#fff}.footer-right{display:flex;gap:8px}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}.field label{font-size:11px;font-weight:900;color:#344054}.field input,.field select,.field textarea{border:1px solid #d0d5dd;border-radius:9px;padding:9px 10px;outline:none;background:#fff;color:var(--text)}.field textarea{min-height:82px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:#84adff;box-shadow:0 0 0 3px rgba(47,128,237,.1)}.readonly input,.readonly select,.readonly textarea{background:#f8fafc;color:#475467;pointer-events:none}.error{min-height:17px;color:var(--danger);font-size:11px;margin-top:6px}.helper{color:var(--muted);font-size:11px;line-height:1.5}.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);padding:0 18px}.tab{border:0;background:transparent;padding:11px 10px;font-weight:800;color:var(--muted);border-bottom:2px solid transparent}.tab.active{color:var(--primary);border-color:var(--primary)}.admin-row,.trash-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.admin-row:last-child,.trash-row:last-child{border-bottom:0}.row-title{font-weight:800;font-size:13px}.row-meta{font-size:11px;color:var(--muted);margin-top:3px}.admin-form{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:14px}.empty-state{text-align:center;color:var(--muted);padding:22px 8px;font-size:12px}
+    .toast{position:fixed;right:18px;bottom:18px;z-index:200;background:#101828;color:#fff;border-radius:9px;padding:11px 14px;opacity:0;pointer-events:none;transform:translateY(8px);transition:.2s;font-size:12px;font-weight:700}.toast.show{opacity:1;transform:none}
+    @media(max-width:1100px){.layout{grid-template-columns:1fr}.side-panel{position:static}.summary-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:700px){.topbar{padding:12px}.container{padding:12px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.period-title{min-width:155px;font-size:14px}.month-day{min-height:85px;padding:5px}.month-item{display:none}.summary-grid{grid-template-columns:1fr 1fr}.admin-form{grid-template-columns:1fr}.day-body{height:500px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar"><div class="topbar-inner">
+    <div class="brand"><h1>Agenda da Assistência Técnica</h1><p>Visitas, treinamentos e compromissos técnicos</p></div>
+    <div class="top-actions">
+      <div class="badge"><span class="dot" id="connDot"></span><span id="connText">Conectando…</span></div>
+      <div class="badge" id="roleBadge">Somente leitura</div>
+      <button class="btn" id="searchBtn">🔎 Buscar</button>
+      <button class="btn" id="masterBtn" style="display:none">⚙ Administração</button>
+      <button class="btn" id="loginBtn">🔐 Administrador</button>
+      <button class="btn btn-primary" id="newBtn" style="display:none">＋ Novo agendamento</button>
+    </div>
+  </div></header>
+
+  <main class="container">
+    <div class="notice" id="notice">Todos podem visualizar a agenda em tempo real. Somente administradores autenticados podem alterar dados.</div>
+    <section class="summary-grid">
+      <div class="summary-card"><span>Compromissos na semana</span><strong id="sumTotal">0</strong></div>
+      <div class="summary-card"><span>Visitas</span><strong id="sumVisits">0</strong></div>
+      <div class="summary-card"><span>Treinamentos</span><strong id="sumTraining">0</strong></div>
+      <div class="summary-card"><span>Pendentes</span><strong id="sumPending">0</strong></div>
+    </section>
+
+    <section class="toolbar">
+      <div class="date-nav"><button class="btn btn-icon" id="prevBtn">‹</button><div class="period-title" id="periodTitle"></div><button class="btn btn-icon" id="nextBtn">›</button><button class="btn" id="todayBtn">Hoje</button></div>
+      <div class="view-switch"><button data-view="week" class="active">Semana</button><button data-view="month">Mês</button></div>
+    </section>
+
+    <section class="layout">
+      <div class="calendar-shell"><div id="calendar"></div></div>
+      <aside class="side-panel" id="sidePanel"><div class="side-head"><h3>Sem alocação</h3><p>Itens sem técnico, data ou horário definido.</p></div><div class="unassigned-list" id="unassignedList"></div></aside>
+    </section>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="apptBackdrop"><div class="modal">
+  <div class="modal-header"><h2 id="apptTitle">Novo agendamento</h2><button class="close" data-close="apptBackdrop">×</button></div>
+  <div class="modal-body"><input type="hidden" id="editId"><div class="form-grid" id="apptForm">
+    <div class="field"><label>Data</label><input type="date" id="date"></div>
+    <div class="field"><label>Horário</label><input type="time" id="time"></div>
+    <div class="field"><label>Tipo</label><select id="type"><option>Visita técnica</option><option>Treinamento</option><option>Instalação</option><option>Manutenção</option><option>Outro</option></select></div>
+    <div class="field"><label>Status</label><select id="status"><option>Agendado</option><option>Confirmado</option><option>Pendente</option><option>Concluído</option><option>Cancelado</option></select></div>
+    <div class="field full"><label>Cliente</label><input id="client" placeholder="Nome do cliente"></div>
+    <div class="field"><label>Cidade / UF</label><input id="city" placeholder="Ex.: Limeira/SP"></div>
+    <div class="field"><label>Técnico responsável</label><input id="technician" placeholder="Nome do técnico"></div>
+    <div class="field"><label>Equipamento</label><input id="equipment" placeholder="Modelo / equipamento"></div>
+    <div class="field"><label>Pedido / OS</label><input id="order" placeholder="Número do pedido ou OS"></div>
+    <div class="field full"><label>Observações</label><textarea id="notes"></textarea></div>
+  </div></div>
+  <div class="modal-footer"><button class="btn btn-danger" id="deleteBtn" style="visibility:hidden">Enviar para lixeira</button><div class="footer-right"><button class="btn" data-close="apptBackdrop">Fechar</button><button class="btn btn-primary" id="saveBtn">Salvar</button></div></div>
+</div></div>
+
+<div class="modal-backdrop" id="loginBackdrop"><div class="modal small">
+  <div class="modal-header"><h2>Login de administrador</h2><button class="close" data-close="loginBackdrop">×</button></div>
+  <div class="modal-body"><div class="field"><label>E-mail</label><input type="email" id="loginEmail" autocomplete="username"></div><div class="field" style="margin-top:11px"><label>Senha</label><input type="password" id="loginPassword" autocomplete="current-password"></div><div class="error" id="loginError"></div></div>
+  <div class="modal-footer"><span></span><div class="footer-right"><button class="btn" data-close="loginBackdrop">Cancelar</button><button class="btn btn-primary" id="doLogin">Entrar</button></div></div>
+</div></div>
+
+<div class="modal-backdrop" id="masterBackdrop"><div class="modal wide">
+  <div class="modal-header"><h2>Administração</h2><button class="close" data-close="masterBackdrop">×</button></div>
+  <div class="tabs"><button class="tab active" data-tab="trash">Lixeira</button><button class="tab" data-tab="admins">Administradores</button></div>
+  <div class="modal-body">
+    <section id="trashTab"><p class="helper">Somente o Admin Mestre consegue visualizar e restaurar itens enviados para a lixeira.</p><div id="trashList"></div></section>
+    <section id="adminsTab" style="display:none"><p class="helper">Para conceder acesso, o usuário precisa existir primeiro em Firebase Authentication. Informe abaixo o UID desse usuário.</p>
+      <div class="admin-form"><div class="field"><label>UID do usuário</label><input id="adminUid"></div><div class="field"><label>Nome</label><input id="adminName"></div><button class="btn btn-primary" id="addAdminBtn">Adicionar admin</button></div>
+      <div id="adminsList"></div>
+    </section>
+  </div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCGztPdxyaW4fePpYhzAqHnjxnblBz6RuU",
+    authDomain: "agenda-assistencia-limerpak.firebaseapp.com",
+    projectId: "agenda-assistencia-limerpak",
+    storageBucket: "agenda-assistencia-limerpak.firebasestorage.app",
+    messagingSenderId: "21557507544",
+    appId: "1:21557507544:web:41ad78aa4cd9e879aeaead"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const FV = firebase.firestore.FieldValue;
+
+  const $ = id => document.getElementById(id);
+  const state = { view:'week', referenceDate:new Date(), appointments:[], user:null, role:'viewer', adminDoc:null };
+  let unsubscribeAppointments = null;
+
+  function canEdit(){ return state.role === 'admin' || state.role === 'master'; }
+  function isMaster(){ return state.role === 'master'; }
+  function localISO(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+  function parseISO(s){ if(!s) return null; const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+  function startOfWeek(date){ const d=new Date(date); const day=d.getDay(); d.setDate(d.getDate()+(day===0?-6:1-day)); d.setHours(0,0,0,0); return d; }
+  function fmt(d,opt){ return new Intl.DateTimeFormat('pt-BR',opt).format(d); }
+  function cap(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : ''; }
+  function esc(s=''){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+  function statusClass(s=''){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+  function toast(msg){ $('toast').textContent=msg; $('toast').classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>$('toast').classList.remove('show'),1800); }
+  function show(id){ $(id).classList.add('show'); }
+  function hide(id){ $(id).classList.remove('show'); }
+  function tsText(v){ if(!v) return '—'; try{ const d=v.toDate?v.toDate():new Date(v); return fmt(d,{dateStyle:'short',timeStyle:'short'}); }catch{return '—';} }
+
+  function updateAccessUI(){
+    $('newBtn').style.display = canEdit() ? '' : 'none';
+    $('masterBtn').style.display = isMaster() ? '' : 'none';
+    $('roleBadge').textContent = state.role==='master' ? 'Admin Mestre' : state.role==='admin' ? 'Administrador' : 'Somente leitura';
+    $('loginBtn').textContent = state.user ? '↪ Sair' : '🔐 Administrador';
+    $('notice').textContent = isMaster() ? 'Admin Mestre: edição, gestão de administradores e restauração da lixeira liberadas.' : canEdit() ? 'Modo administrador: você pode criar, editar e enviar compromissos para a lixeira.' : 'Todos podem visualizar a agenda em tempo real. Somente administradores autenticados podem alterar dados.';
+  }
+
+  function connectAppointments(){
+    if(unsubscribeAppointments) unsubscribeAppointments();
+    $('connText').textContent='Conectando…'; $('connDot').className='dot';
+    const q = db.collection('appointments').where('deleted','==',false);
+    unsubscribeAppointments = q.onSnapshot(snap=>{
+      state.appointments = snap.docs.map(d=>({id:d.id,...d.data()}));
+      $('connText').textContent='Online'; $('connDot').className='dot online'; render();
+    },err=>{
+      console.error(err); $('connText').textContent='Erro de conexão'; $('connDot').className='dot error';
+      $('notice').textContent='Não foi possível carregar a agenda. Verifique as regras do Firestore e a conexão com a internet.';
+    });
+  }
+
+  auth.onAuthStateChanged(async user=>{
+    state.user=user; state.role='viewer'; state.adminDoc=null;
+    if(user){
+      try{
+        const doc=await db.collection('admins').doc(user.uid).get();
+        if(doc.exists && doc.data().active===true){ state.adminDoc=doc.data(); state.role=doc.data().role==='master'?'master':'admin'; }
+      }catch(e){ console.error(e); }
+    }
+    updateAccessUI(); render();
+  });
+
+  function render(){
+    document.querySelectorAll('.view-switch button').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
+    if(state.view==='week'){ renderWeek(); $('sidePanel').style.display=''; } else { renderMonth(); $('sidePanel').style.display='none'; }
+    renderSummary(); renderUnassigned();
+  }
+
+  function renderWeek(){
+    const mon=startOfWeek(state.referenceDate), fri=new Date(mon); fri.setDate(fri.getDate()+4);
+    $('periodTitle').textContent=`Semana ${fmt(mon,{day:'2-digit'})}–${fmt(fri,{day:'2-digit',month:'short',year:'numeric'})}`.replace('.','');
+    const today=localISO(new Date()); let html='<div class="week-grid">';
+    for(let i=0;i<5;i++){
+      const d=new Date(mon); d.setDate(mon.getDate()+i); const iso=localISO(d);
+      const list=state.appointments.filter(a=>a.date===iso).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+      html+=`<section class="day-column ${iso===today?'current':''}"><div class="day-head"><div class="day-name">${fmt(d,{weekday:'long'})}</div><div class="day-date"><span>${fmt(d,{day:'2-digit',month:'2-digit'})}</span>${iso===today?'<span class="today-badge">HOJE</span>':''}</div></div><div class="day-body" data-date="${iso}">${list.map(cardHTML).join('')||'<div class="empty-day">Nenhum compromisso</div>'}</div></section>`;
+    }
+    html+='</div>'; $('calendar').innerHTML=html;
+    $('calendar').querySelectorAll('.appointment').forEach(x=>x.addEventListener('click',()=>openAppointment(x.dataset.id)));
+    if(canEdit()) $('calendar').querySelectorAll('.day-body').forEach(x=>x.addEventListener('dblclick',e=>{if(!e.target.closest('.appointment'))openNew(x.dataset.date);}));
+  }
+
+  function cardHTML(a){
+    return `<article class="appointment" data-id="${a.id}" data-type="${esc(a.type||'')}"><div class="appt-top"><div class="appt-time">${esc(a.time||'Horário pendente')}</div><span class="status-dot ${statusClass(a.status)}" title="${esc(a.status||'')}"></span></div><div class="appt-title">${esc(a.client||'Sem cliente')}</div><div class="appt-meta"><span>${esc(a.type||'')}</span><span>👤 ${esc(a.technician||'Técnico pendente')}</span>${a.city?`<span>📍 ${esc(a.city)}</span>`:''}${a.equipment?`<span>⚙️ ${esc(a.equipment)}</span>`:''}</div></article>`;
+  }
+
+  function renderMonth(){
+    const first=new Date(state.referenceDate.getFullYear(),state.referenceDate.getMonth(),1); $('periodTitle').textContent=cap(fmt(first,{month:'long',year:'numeric'}));
+    const wd=first.getDay(), start=new Date(first); start.setDate(first.getDate()+(wd===0?-6:1-wd)); const today=localISO(new Date());
+    let html='<div class="month-grid">'+['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(x=>`<div class="month-weekday">${x}</div>`).join('');
+    for(let i=0;i<42;i++){ const d=new Date(start); d.setDate(start.getDate()+i); const iso=localISO(d); const list=state.appointments.filter(a=>a.date===iso).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99')); html+=`<div class="month-day ${d.getMonth()!==first.getMonth()?'outside':''} ${iso===today?'today':''}" data-date="${iso}"><div class="month-number">${d.getDate()}</div>${list.slice(0,3).map(a=>`<div class="month-item">${esc(a.time||'—')} · ${esc(a.client||'')}</div>`).join('')}${list.length>3?`<div class="month-more">+${list.length-3} compromisso(s)</div>`:''}</div>`; }
+    html+='</div>'; $('calendar').innerHTML=html; $('calendar').querySelectorAll('.month-day').forEach(x=>x.addEventListener('click',()=>{state.referenceDate=parseISO(x.dataset.date);state.view='week';render();}));
+  }
+
+  function renderSummary(){
+    const mon=startOfWeek(state.referenceDate), fri=new Date(mon); fri.setDate(fri.getDate()+4); fri.setHours(23,59,59,999);
+    const w=state.appointments.filter(a=>a.date&&parseISO(a.date)>=mon&&parseISO(a.date)<=fri);
+    $('sumTotal').textContent=w.length; $('sumVisits').textContent=w.filter(a=>a.type==='Visita técnica').length; $('sumTraining').textContent=w.filter(a=>a.type==='Treinamento').length; $('sumPending').textContent=w.filter(a=>a.status==='Pendente').length;
+  }
+
+  function renderUnassigned(){
+    const list=state.appointments.filter(a=>!a.date||!a.time||!a.technician);
+    $('unassignedList').innerHTML=list.length?list.map(a=>`<div class="unassigned" data-id="${a.id}"><strong>${esc(a.client||'Sem cliente')}</strong><small>${esc(a.type||'')} · ${esc(a.date||'sem data')} · ${esc(a.technician||'sem técnico')}</small></div>`).join(''):'<div class="side-empty">Tudo alocado por enquanto.</div>';
+    $('unassignedList').querySelectorAll('.unassigned').forEach(x=>x.addEventListener('click',()=>openAppointment(x.dataset.id)));
+  }
+
+  function setReadonly(readonly){
+    $('apptForm').classList.toggle('readonly',readonly); $('apptForm').querySelectorAll('input,select,textarea').forEach(el=>el.disabled=readonly);
+    $('saveBtn').style.display=readonly?'none':''; $('deleteBtn').style.visibility=readonly?'hidden':($('editId').value?'visible':'hidden');
+  }
+  function resetAppt(){ ['editId','date','time','client','city','technician','equipment','order','notes'].forEach(id=>$(id).value=''); $('type').value='Visita técnica'; $('status').value='Agendado'; }
+  function openNew(date=''){ if(!canEdit())return; resetAppt(); $('apptTitle').textContent='Novo agendamento'; $('date').value=date||localISO(new Date()); setReadonly(false); show('apptBackdrop'); }
+  function openAppointment(id){
+    const a=state.appointments.find(x=>x.id===id); if(!a)return; resetAppt(); $('editId').value=a.id; $('date').value=a.date||''; $('time').value=a.time||''; $('type').value=a.type||'Visita técnica'; $('status').value=a.status||'Agendado'; $('client').value=a.client||''; $('city').value=a.city||''; $('technician').value=a.technician||''; $('equipment').value=a.equipment||''; $('order').value=a.order||''; $('notes').value=a.notes||''; $('apptTitle').textContent=canEdit()?'Editar agendamento':'Detalhes do agendamento'; setReadonly(!canEdit()); show('apptBackdrop');
+  }
+
+  async function saveAppointment(){
+    if(!canEdit())return; const client=$('client').value.trim(); if(!client){toast('Informe o cliente.');return;}
+    const data={date:$('date').value||'',time:$('time').value||'',type:$('type').value,status:$('status').value,client,city:$('city').value.trim(),technician:$('technician').value.trim(),equipment:$('equipment').value.trim(),order:$('order').value.trim(),notes:$('notes').value.trim(),deleted:false,updatedAt:FV.serverTimestamp(),updatedBy:state.user.uid};
+    try{ const id=$('editId').value; if(id) await db.collection('appointments').doc(id).update(data); else await db.collection('appointments').add({...data,createdAt:FV.serverTimestamp(),createdBy:state.user.uid}); hide('apptBackdrop'); toast(id?'Agendamento atualizado.':'Agendamento criado.'); }catch(e){console.error(e);toast('Erro ao salvar. Verifique sua permissão.');}
+  }
+  async function trashAppointment(){
+    if(!canEdit()||!$('editId').value)return; if(!confirm('Enviar este agendamento para a lixeira?'))return;
+    try{ await db.collection('appointments').doc($('editId').value).update({deleted:true,deletedAt:FV.serverTimestamp(),deletedBy:state.user.uid,updatedAt:FV.serverTimestamp(),updatedBy:state.user.uid}); hide('apptBackdrop'); toast('Agendamento enviado para a lixeira.'); }catch(e){console.error(e);toast('Erro ao excluir.');}
+  }
+
+  async function openMaster(){ if(!isMaster())return; show('masterBackdrop'); await loadTrash(); }
+  async function loadTrash(){
+    $('trashList').innerHTML='<div class="empty-state">Carregando…</div>';
+    try{ const snap=await db.collection('appointments').where('deleted','==',true).get(); const rows=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{const av=a.deletedAt?.toMillis?.()||0,bv=b.deletedAt?.toMillis?.()||0;return bv-av;}); $('trashList').innerHTML=rows.length?rows.map(a=>`<div class="trash-row"><div><div class="row-title">${esc(a.client||'Sem cliente')}</div><div class="row-meta">${esc(a.date||'sem data')} ${esc(a.time||'')} · ${esc(a.technician||'sem técnico')}<br>Excluído em: ${tsText(a.deletedAt)} · UID: ${esc(a.deletedBy||'—')}</div></div><button class="btn btn-primary restore" data-id="${a.id}">Restaurar</button></div>`).join(''):'<div class="empty-state">A lixeira está vazia.</div>'; $('trashList').querySelectorAll('.restore').forEach(b=>b.addEventListener('click',()=>restoreAppointment(b.dataset.id))); }catch(e){console.error(e);$('trashList').innerHTML='<div class="empty-state">Erro ao carregar lixeira.</div>';}
+  }
+  async function restoreAppointment(id){ if(!isMaster())return; try{await db.collection('appointments').doc(id).update({deleted:false,restoredAt:FV.serverTimestamp(),restoredBy:state.user.uid,updatedAt:FV.serverTimestamp(),updatedBy:state.user.uid});toast('Agendamento restaurado.');await loadTrash();}catch(e){console.error(e);toast('Erro ao restaurar.');} }
+
+  async function loadAdmins(){
+    $('adminsList').innerHTML='<div class="empty-state">Carregando…</div>';
+    try{const snap=await db.collection('admins').get();const rows=snap.docs.map(d=>({uid:d.id,...d.data()}));$('adminsList').innerHTML=rows.length?rows.map(a=>`<div class="admin-row"><div><div class="row-title">${esc(a.name||'Sem nome')} ${a.role==='master'?'· Admin Mestre':''}</div><div class="row-meta">UID: ${esc(a.uid)} · ${a.active===true?'Ativo':'Inativo'}</div></div>${a.role==='master'?'<span class="badge">Protegido</span>':`<button class="btn toggle-admin" data-uid="${a.uid}" data-active="${a.active===true}">${a.active===true?'Desativar':'Ativar'}</button>`}</div>`).join(''):'<div class="empty-state">Nenhum administrador cadastrado.</div>';document.querySelectorAll('.toggle-admin').forEach(b=>b.addEventListener('click',()=>toggleAdmin(b.dataset.uid,b.dataset.active==='true')));}catch(e){console.error(e);$('adminsList').innerHTML='<div class="empty-state">Erro ao carregar administradores.</div>';}
+  }
+  async function addAdmin(){ if(!isMaster())return; const uid=$('adminUid').value.trim(),name=$('adminName').value.trim(); if(!uid||!name){toast('Informe UID e nome.');return;} try{await db.collection('admins').doc(uid).set({role:'admin',active:true,name});$('adminUid').value='';$('adminName').value='';toast('Administrador adicionado.');await loadAdmins();}catch(e){console.error(e);toast('Erro ao adicionar administrador.');} }
+  async function toggleAdmin(uid,isActive){ if(!isMaster())return; try{await db.collection('admins').doc(uid).update({role:'admin',active:!isActive});toast(!isActive?'Administrador ativado.':'Administrador desativado.');await loadAdmins();}catch(e){console.error(e);toast('Erro ao alterar administrador.');} }
+
+  async function login(){ $('loginError').textContent=''; try{await auth.signInWithEmailAndPassword($('loginEmail').value.trim(),$('loginPassword').value);$('loginPassword').value='';hide('loginBackdrop');toast('Login realizado.');}catch(e){console.error(e);$('loginError').textContent='E-mail ou senha inválidos, ou acesso não autorizado.';} }
+
+  $('newBtn').addEventListener('click',()=>openNew()); $('saveBtn').addEventListener('click',saveAppointment); $('deleteBtn').addEventListener('click',trashAppointment);
+  $('loginBtn').addEventListener('click',async()=>{if(state.user){await auth.signOut();toast('Sessão encerrada.');}else show('loginBackdrop');}); $('doLogin').addEventListener('click',login); $('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+  $('masterBtn').addEventListener('click',openMaster); $('addAdminBtn').addEventListener('click',addAdmin);
+  document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>hide(b.dataset.close))); document.querySelectorAll('.modal-backdrop').forEach(x=>x.addEventListener('click',e=>{if(e.target===x)hide(x.id);}));
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',async()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');const admins=t.dataset.tab==='admins';$('trashTab').style.display=admins?'none':'';$('adminsTab').style.display=admins?'':'none';if(admins)await loadAdmins();else await loadTrash();}));
+  $('prevBtn').addEventListener('click',()=>{if(state.view==='week')state.referenceDate.setDate(state.referenceDate.getDate()-7);else state.referenceDate.setMonth(state.referenceDate.getMonth()-1);state.referenceDate=new Date(state.referenceDate);render();});
+  $('nextBtn').addEventListener('click',()=>{if(state.view==='week')state.referenceDate.setDate(state.referenceDate.getDate()+7);else state.referenceDate.setMonth(state.referenceDate.getMonth()+1);state.referenceDate=new Date(state.referenceDate);render();});
+  $('todayBtn').addEventListener('click',()=>{state.referenceDate=new Date();render();}); document.querySelectorAll('.view-switch button').forEach(b=>b.addEventListener('click',()=>{state.view=b.dataset.view;render();}));
+  $('searchBtn').addEventListener('click',()=>{const term=prompt('Buscar por cliente, técnico, cidade, equipamento, pedido/OS ou observação:');if(!term)return;const q=term.toLowerCase();const r=state.appointments.filter(a=>Object.values(a).some(v=>String(v??'').toLowerCase().includes(q))).sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));if(!r.length){alert('Nenhum agendamento encontrado.');return;}if(r[0].date)state.referenceDate=parseISO(r[0].date);state.view='week';render();setTimeout(()=>openAppointment(r[0].id),80);});
+
+  connectAppointments(); updateAccessUI(); render();
+</script>
+</body>
+</html>
