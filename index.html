@@ -35,6 +35,13 @@
     .modal-header{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;background:#fff;z-index:2}.modal-header h2{margin:0;font-size:18px}.close{border:0;background:transparent;font-size:23px;color:var(--muted)}.modal-body{padding:18px}.modal-footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:9px;position:sticky;bottom:0;background:#fff}.footer-right{display:flex;gap:8px}
     .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}.field label{font-size:11px;font-weight:900;color:#344054}.field input,.field select,.field textarea{border:1px solid #d0d5dd;border-radius:9px;padding:9px 10px;outline:none;background:#fff;color:var(--text)}.field textarea{min-height:82px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:#84adff;box-shadow:0 0 0 3px rgba(47,128,237,.1)}.readonly input,.readonly select,.readonly textarea{background:#f8fafc;color:#475467;pointer-events:none}.error{min-height:17px;color:var(--danger);font-size:11px;margin-top:6px}.helper{color:var(--muted);font-size:11px;line-height:1.5}.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);padding:0 18px}.tab{border:0;background:transparent;padding:11px 10px;font-weight:800;color:var(--muted);border-bottom:2px solid transparent}.tab.active{color:var(--primary);border-color:var(--primary)}.admin-row,.trash-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.admin-row:last-child,.trash-row:last-child{border-bottom:0}.row-title{font-weight:800;font-size:13px}.row-meta{font-size:11px;color:var(--muted);margin-top:3px}.admin-form{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:14px}.empty-state{text-align:center;color:var(--muted);padding:22px 8px;font-size:12px}
     .toast{position:fixed;right:18px;bottom:18px;z-index:200;background:#101828;color:#fff;border-radius:9px;padding:11px 14px;opacity:0;pointer-events:none;transform:translateY(8px);transition:.2s;font-size:12px;font-weight:700}.toast.show{opacity:1;transform:none}
+    .filters-bar{display:flex;align-items:end;gap:9px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:13px;padding:11px 12px;margin-bottom:14px}
+    .filter-field{display:flex;flex-direction:column;gap:4px;min-width:160px;flex:1}.filter-field label{font-size:10px;text-transform:uppercase;font-weight:900;color:var(--muted);letter-spacing:.04em}.filter-field select{width:100%;border:1px solid #d0d5dd;border-radius:9px;padding:8px 9px;background:#fff;color:var(--text)}
+    .tech-board-wrap{overflow-x:auto}.tech-board{min-width:980px}.tech-grid-head,.tech-row-grid{display:grid;grid-template-columns:170px repeat(5,minmax(150px,1fr))}
+    .tech-grid-head{background:var(--surface2);border-bottom:1px solid var(--line)}.tech-grid-head>div{padding:10px;border-right:1px solid var(--line);font-size:10px;text-transform:uppercase;font-weight:900;color:var(--muted);text-align:center}.tech-grid-head>div:first-child{text-align:left}.tech-grid-head>div:last-child{border-right:0}
+    .tech-row-grid{border-bottom:1px solid var(--line);min-height:115px}.tech-row-grid:last-child{border-bottom:0}.tech-name-cell{padding:12px;border-right:1px solid var(--line);background:#fafbfc}.tech-name-cell strong{display:block;font-size:13px}.tech-name-cell small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
+    .tech-day-cell{padding:7px;border-right:1px solid var(--line);min-height:115px}.tech-day-cell:last-child{border-right:0}.tech-mini{border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:8px;padding:7px;margin-bottom:6px;background:#fff;cursor:pointer}.tech-mini:hover{background:#fafcff}.tech-mini-time{font-size:10px;font-weight:900}.tech-mini-client{font-size:11px;font-weight:800;margin-top:2px}.tech-mini-meta{font-size:9px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tech-admin-actions{display:flex;gap:7px;flex-wrap:wrap}.tech-status{font-size:10px;font-weight:800;color:var(--muted)}
     @media(max-width:1100px){.layout{grid-template-columns:1fr}.side-panel{position:static}.summary-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:700px){.topbar{padding:12px}.container{padding:12px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.period-title{min-width:155px;font-size:14px}.month-day{min-height:85px;padding:5px}.month-item{display:none}.summary-grid{grid-template-columns:1fr 1fr}.admin-form{grid-template-columns:1fr}.day-body{height:500px}}
   </style>
@@ -64,7 +71,18 @@
 
     <section class="toolbar">
       <div class="date-nav"><button class="btn btn-icon" id="prevBtn">‹</button><div class="period-title" id="periodTitle"></div><button class="btn btn-icon" id="nextBtn">›</button><button class="btn" id="todayBtn">Hoje</button></div>
-      <div class="view-switch"><button data-view="week" class="active">Semana</button><button data-view="month">Mês</button></div>
+      <div class="view-switch"><button data-view="week" class="active">Semana</button><button data-view="month">Mês</button><button data-view="technicians">Técnicos</button></div>
+    </section>
+
+    <section class="filters-bar">
+      <div class="filter-field"><label>Técnico</label><select id="filterTechnician"><option value="">Todos os técnicos</option></select></div>
+      <div class="filter-field"><label>Carro</label><select id="filterVehicle">
+        <option value="">Todos os carros</option>
+        <option>ONIX - FTK 0I92</option><option>ONIX - GCJ 6H84</option><option>ONIX - STE 0A73</option><option>ONIX - SUR 2C45</option><option>ONIX - SWJ 6E71</option>
+      </select></div>
+      <div class="filter-field"><label>Tipo</label><select id="filterType"><option value="">Todos os tipos</option><option>Visita técnica</option><option>Treinamento</option><option>Instalação</option><option>Manutenção</option><option>Outro</option></select></div>
+      <div class="filter-field"><label>Status</label><select id="filterStatus"><option value="">Todos os status</option><option>Agendado</option><option>Confirmado</option><option>Pendente</option><option>Concluído</option><option>Cancelado</option></select></div>
+      <button class="btn" id="clearFiltersBtn">Limpar filtros</button>
     </section>
 
     <section class="layout">
@@ -78,12 +96,13 @@
   <div class="modal-header"><h2 id="apptTitle">Novo agendamento</h2><button class="close" data-close="apptBackdrop">×</button></div>
   <div class="modal-body"><input type="hidden" id="editId"><div class="form-grid" id="apptForm">
     <div class="field"><label>Data</label><input type="date" id="date"></div>
-    <div class="field"><label>Horário</label><input type="time" id="time"></div>
+    <div class="field"><label>Horário inicial</label><input type="time" id="time"></div>
+    <div class="field"><label>Horário final</label><input type="time" id="endTime"></div>
     <div class="field"><label>Tipo</label><select id="type"><option>Visita técnica</option><option>Treinamento</option><option>Instalação</option><option>Manutenção</option><option>Outro</option></select></div>
     <div class="field"><label>Status</label><select id="status"><option>Agendado</option><option>Confirmado</option><option>Pendente</option><option>Concluído</option><option>Cancelado</option></select></div>
     <div class="field full"><label>Cliente</label><input id="client" placeholder="Nome do cliente"></div>
     <div class="field"><label>Cidade / UF</label><input id="city" placeholder="Ex.: Limeira/SP"></div>
-    <div class="field"><label>Técnico responsável</label><input id="technician" placeholder="Nome do técnico"></div>
+    <div class="field"><label>Técnico responsável</label><select id="technician"><option value="">Selecione o técnico</option></select></div>
     <div class="field"><label>Carro</label><select id="vehicle">
       <option value="">Selecione o carro</option>
       <option>ONIX - FTK 0I92</option>
@@ -107,12 +126,17 @@
 
 <div class="modal-backdrop" id="masterBackdrop"><div class="modal wide">
   <div class="modal-header"><h2>Administração</h2><button class="close" data-close="masterBackdrop">×</button></div>
-  <div class="tabs"><button class="tab active" data-tab="trash">Lixeira</button><button class="tab" data-tab="admins">Administradores</button></div>
+  <div class="tabs"><button class="tab active" data-tab="trash">Lixeira</button><button class="tab" data-tab="admins">Administradores</button><button class="tab" data-tab="technicians">Técnicos</button></div>
   <div class="modal-body">
     <section id="trashTab"><p class="helper">Somente o Admin Mestre consegue visualizar e restaurar itens enviados para a lixeira.</p><div id="trashList"></div></section>
     <section id="adminsTab" style="display:none"><p class="helper">Para conceder acesso, o usuário precisa existir primeiro em Firebase Authentication. Informe abaixo o UID desse usuário.</p>
       <div class="admin-form"><div class="field"><label>UID do usuário</label><input id="adminUid"></div><div class="field"><label>Nome</label><input id="adminName"></div><button class="btn btn-primary" id="addAdminBtn">Adicionar admin</button></div>
       <div id="adminsList"></div>
+    </section>
+    <section id="techniciansTab" style="display:none"><p class="helper">Cadastre aqui os técnicos que poderão ser selecionados nos agendamentos. Técnicos desativados continuam aparecendo nos registros antigos, mas deixam de aparecer para novos agendamentos.</p>
+      <div class="admin-form"><div class="field"><label>Nome do técnico</label><input id="techName" placeholder="Nome completo"></div><div></div><button class="btn btn-primary" id="addTechBtn">Adicionar técnico</button></div>
+      <div class="tech-admin-actions"><button class="btn" id="importTechBtn">Importar nomes já usados na agenda</button></div>
+      <div id="techniciansList" style="margin-top:10px"></div>
     </section>
   </div>
 </div></div>
@@ -138,8 +162,18 @@
   const FV = firebase.firestore.FieldValue;
 
   const $ = id => document.getElementById(id);
-  const state = { view:'week', referenceDate:new Date(), appointments:[], user:null, role:'viewer', adminDoc:null };
+  const state = {
+    view:'week',
+    referenceDate:new Date(),
+    appointments:[],
+    technicians:[],
+    filters:{technician:'',vehicle:'',type:'',status:''},
+    user:null,
+    role:'viewer',
+    adminDoc:null
+  };
   let unsubscribeAppointments = null;
+  let unsubscribeTechnicians = null;
 
   function canEdit(){ return state.role === 'admin' || state.role === 'master'; }
   function isMaster(){ return state.role === 'master'; }
@@ -154,6 +188,31 @@
   function show(id){ $(id).classList.add('show'); }
   function hide(id){ $(id).classList.remove('show'); }
   function tsText(v){ if(!v) return '—'; try{ const d=v.toDate?v.toDate():new Date(v); return fmt(d,{dateStyle:'short',timeStyle:'short'}); }catch{return '—';} }
+  function filteredAppointments(){
+    return state.appointments.filter(a=>
+      (!state.filters.technician || (a.technician||'')===state.filters.technician) &&
+      (!state.filters.vehicle || (a.vehicle||'')===state.filters.vehicle) &&
+      (!state.filters.type || (a.type||'')===state.filters.type) &&
+      (!state.filters.status || (a.status||'')===state.filters.status)
+    );
+  }
+  function technicianNames(includeInactiveUsed=true){
+    const set=new Set(state.technicians.filter(t=>t.active===true).map(t=>t.name).filter(Boolean));
+    if(includeInactiveUsed) state.appointments.forEach(a=>{ if(a.technician) set.add(a.technician); });
+    return [...set].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  }
+  function populateTechnicianFilter(){
+    const current=$('filterTechnician').value;
+    $('filterTechnician').innerHTML='<option value="">Todos os técnicos</option>'+technicianNames(true).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+    $('filterTechnician').value=current;
+  }
+  function populateTechnicianSelect(current=''){
+    const names=technicianNames(false);
+    if(current && !names.includes(current)) names.push(current);
+    names.sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    $('technician').innerHTML='<option value="">Selecione o técnico</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+    $('technician').value=current||'';
+  }
 
   function updateAccessUI(){
     $('newBtn').style.display = canEdit() ? '' : 'none';
@@ -176,6 +235,22 @@
     });
   }
 
+  function connectTechnicians(){
+    if(unsubscribeTechnicians) unsubscribeTechnicians();
+    unsubscribeTechnicians = db.collection('technicians').onSnapshot(snap=>{
+      state.technicians=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR'));
+      populateTechnicianFilter();
+      populateTechnicianSelect($('technician')?.value||'');
+      if($('techniciansTab') && $('techniciansTab').style.display!=='none') renderTechniciansAdmin();
+      render();
+    },err=>{
+      console.error('Erro ao carregar técnicos:',err);
+      state.technicians=[];
+      populateTechnicianFilter();
+      render();
+    });
+  }
+
   auth.onAuthStateChanged(async user=>{
     state.user=user; state.role='viewer'; state.adminDoc=null;
     if(user){
@@ -189,7 +264,9 @@
 
   function render(){
     document.querySelectorAll('.view-switch button').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
-    if(state.view==='week'){ renderWeek(); $('sidePanel').style.display=''; } else { renderMonth(); $('sidePanel').style.display='none'; }
+    if(state.view==='week'){ renderWeek(); $('sidePanel').style.display=''; }
+    else if(state.view==='month'){ renderMonth(); $('sidePanel').style.display='none'; }
+    else { renderTechniciansView(); $('sidePanel').style.display='none'; }
     renderSummary(); renderUnassigned();
   }
 
@@ -199,7 +276,7 @@
     const today=localISO(new Date()); let html='<div class="week-grid">';
     for(let i=0;i<5;i++){
       const d=new Date(mon); d.setDate(mon.getDate()+i); const iso=localISO(d);
-      const list=state.appointments.filter(a=>a.date===iso).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+      const list=filteredAppointments().filter(a=>a.date===iso).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
       html+=`<section class="day-column ${iso===today?'current':''}"><div class="day-head"><div class="day-name">${fmt(d,{weekday:'long'})}</div><div class="day-date"><span>${fmt(d,{day:'2-digit',month:'2-digit'})}</span>${iso===today?'<span class="today-badge">HOJE</span>':''}</div></div><div class="day-body" data-date="${iso}">${list.map(cardHTML).join('')||'<div class="empty-day">Nenhum compromisso</div>'}</div></section>`;
     }
     html+='</div>'; $('calendar').innerHTML=html;
@@ -208,25 +285,58 @@
   }
 
   function cardHTML(a){
-    return `<article class="appointment" data-id="${a.id}" data-type="${esc(a.type||'')}"><div class="appt-top"><div class="appt-time">${esc(a.time||'Horário pendente')}</div><span class="status-dot ${statusClass(a.status)}" title="${esc(a.status||'')}"></span></div><div class="appt-title">${esc(a.client||'Sem cliente')}</div><div class="appt-meta"><span>${esc(a.type||'')}</span><span>👤 ${esc(a.technician||'Técnico pendente')}</span>${a.city?`<span>📍 ${esc(a.city)}</span>`:''}${a.vehicle?`<span>🚗 ${esc(a.vehicle)}</span>`:''}${a.equipment?`<span>⚙️ ${esc(a.equipment)}</span>`:''}</div></article>`;
+    const timeText=a.time ? `${a.time}${a.endTime?'–'+a.endTime:''}` : 'Horário pendente';
+    return `<article class="appointment" data-id="${a.id}" data-type="${esc(a.type||'')}"><div class="appt-top"><div class="appt-time">${esc(timeText)}</div><span class="status-dot ${statusClass(a.status)}" title="${esc(a.status||'')}"></span></div><div class="appt-title">${esc(a.client||'Sem cliente')}</div><div class="appt-meta"><span>${esc(a.type||'')}</span><span>👤 ${esc(a.technician||'Técnico pendente')}</span>${a.city?`<span>📍 ${esc(a.city)}</span>`:''}${a.vehicle?`<span>🚗 ${esc(a.vehicle)}</span>`:''}${a.equipment?`<span>⚙️ ${esc(a.equipment)}</span>`:''}</div></article>`;
   }
 
   function renderMonth(){
     const first=new Date(state.referenceDate.getFullYear(),state.referenceDate.getMonth(),1); $('periodTitle').textContent=cap(fmt(first,{month:'long',year:'numeric'}));
     const wd=first.getDay(), start=new Date(first); start.setDate(first.getDate()+(wd===0?-6:1-wd)); const today=localISO(new Date());
     let html='<div class="month-grid">'+['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(x=>`<div class="month-weekday">${x}</div>`).join('');
-    for(let i=0;i<42;i++){ const d=new Date(start); d.setDate(start.getDate()+i); const iso=localISO(d); const list=state.appointments.filter(a=>a.date===iso).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99')); html+=`<div class="month-day ${d.getMonth()!==first.getMonth()?'outside':''} ${iso===today?'today':''}" data-date="${iso}"><div class="month-number">${d.getDate()}</div>${list.slice(0,3).map(a=>`<div class="month-item">${esc(a.time||'—')} · ${esc(a.client||'')}</div>`).join('')}${list.length>3?`<div class="month-more">+${list.length-3} compromisso(s)</div>`:''}</div>`; }
+    for(let i=0;i<42;i++){ const d=new Date(start); d.setDate(start.getDate()+i); const iso=localISO(d); const list=filteredAppointments().filter(a=>a.date===iso).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99')); html+=`<div class="month-day ${d.getMonth()!==first.getMonth()?'outside':''} ${iso===today?'today':''}" data-date="${iso}"><div class="month-number">${d.getDate()}</div>${list.slice(0,3).map(a=>`<div class="month-item">${esc(a.time?`${a.time}${a.endTime?'–'+a.endTime:''}`:'—')} · ${esc(a.client||'')}</div>`).join('')}${list.length>3?`<div class="month-more">+${list.length-3} compromisso(s)</div>`:''}</div>`; }
     html+='</div>'; $('calendar').innerHTML=html; $('calendar').querySelectorAll('.month-day').forEach(x=>x.addEventListener('click',()=>{state.referenceDate=parseISO(x.dataset.date);state.view='week';render();}));
+  }
+
+  function renderTechniciansView(){
+    const mon=startOfWeek(state.referenceDate), fri=new Date(mon); fri.setDate(fri.getDate()+4);
+    $('periodTitle').textContent=`Semana ${fmt(mon,{day:'2-digit'})}–${fmt(fri,{day:'2-digit',month:'short',year:'numeric'})}`.replace('.','');
+    const all=filteredAppointments();
+    const week=all.filter(a=>a.date&&parseISO(a.date)>=mon&&parseISO(a.date)<=fri);
+    let names=technicianNames(true);
+    if(state.filters.technician) names=names.filter(n=>n===state.filters.technician);
+    const hasUnassigned=week.some(a=>!a.technician);
+    if(hasUnassigned && !state.filters.technician) names.push('Sem técnico');
+    const days=[];
+    for(let i=0;i<5;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);days.push(d);}
+    let html='<div class="tech-board-wrap"><div class="tech-board"><div class="tech-grid-head"><div>Técnico</div>'+days.map(d=>`<div>${fmt(d,{weekday:'short'})}<br>${fmt(d,{day:'2-digit',month:'2-digit'})}</div>`).join('')+'</div>';
+    if(!names.length){
+      html+='<div class="empty-state">Nenhum técnico cadastrado. O Admin Mestre pode cadastrar em Administração → Técnicos.</div>';
+    } else {
+      for(const name of names){
+        const isUnassigned=name==='Sem técnico';
+        const total=week.filter(a=>isUnassigned?!a.technician:a.technician===name).length;
+        html+=`<div class="tech-row-grid"><div class="tech-name-cell"><strong>${esc(name)}</strong><small>${total} compromisso(s) na semana</small></div>`;
+        for(const d of days){
+          const iso=localISO(d);
+          const list=week.filter(a=>a.date===iso&&(isUnassigned?!a.technician:a.technician===name)).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+          html+=`<div class="tech-day-cell">${list.map(a=>`<div class="tech-mini" data-id="${a.id}"><div class="tech-mini-time">${esc(a.time?`${a.time}${a.endTime?'–'+a.endTime:''}`:'Horário pendente')}</div><div class="tech-mini-client">${esc(a.client||'Sem cliente')}</div><div class="tech-mini-meta">${esc(a.city||'')}${a.vehicle?` · 🚗 ${esc(a.vehicle)}`:''}</div></div>`).join('')}</div>`;
+        }
+        html+='</div>';
+      }
+    }
+    html+='</div></div>';
+    $('calendar').innerHTML=html;
+    $('calendar').querySelectorAll('.tech-mini').forEach(x=>x.addEventListener('click',()=>openAppointment(x.dataset.id)));
   }
 
   function renderSummary(){
     const mon=startOfWeek(state.referenceDate), fri=new Date(mon); fri.setDate(fri.getDate()+4); fri.setHours(23,59,59,999);
-    const w=state.appointments.filter(a=>a.date&&parseISO(a.date)>=mon&&parseISO(a.date)<=fri);
+    const w=filteredAppointments().filter(a=>a.date&&parseISO(a.date)>=mon&&parseISO(a.date)<=fri);
     $('sumTotal').textContent=w.length; $('sumVisits').textContent=w.filter(a=>a.type==='Visita técnica').length; $('sumTraining').textContent=w.filter(a=>a.type==='Treinamento').length; $('sumPending').textContent=w.filter(a=>a.status==='Pendente').length;
   }
 
   function renderUnassigned(){
-    const list=state.appointments.filter(a=>!a.date||!a.time||!a.technician);
+    const list=filteredAppointments().filter(a=>!a.date||!a.time||!a.technician);
     $('unassignedList').innerHTML=list.length?list.map(a=>`<div class="unassigned" data-id="${a.id}"><strong>${esc(a.client||'Sem cliente')}</strong><small>${esc(a.type||'')} · ${esc(a.date||'sem data')} · ${esc(a.technician||'sem técnico')}</small></div>`).join(''):'<div class="side-empty">Tudo alocado por enquanto.</div>';
     $('unassignedList').querySelectorAll('.unassigned').forEach(x=>x.addEventListener('click',()=>openAppointment(x.dataset.id)));
   }
@@ -235,15 +345,15 @@
     $('apptForm').classList.toggle('readonly',readonly); $('apptForm').querySelectorAll('input,select,textarea').forEach(el=>el.disabled=readonly);
     $('saveBtn').style.display=readonly?'none':''; $('deleteBtn').style.visibility=readonly?'hidden':($('editId').value?'visible':'hidden');
   }
-  function resetAppt(){ ['editId','date','time','client','city','technician','equipment','order','notes'].forEach(id=>$(id).value=''); $('vehicle').value=''; $('type').value='Visita técnica'; $('status').value='Agendado'; }
+  function resetAppt(){ ['editId','date','time','endTime','client','city','equipment','order','notes'].forEach(id=>$(id).value=''); populateTechnicianSelect(''); $('vehicle').value=''; $('type').value='Visita técnica'; $('status').value='Agendado'; }
   function openNew(date=''){ if(!canEdit())return; resetAppt(); $('apptTitle').textContent='Novo agendamento'; $('date').value=date||localISO(new Date()); setReadonly(false); show('apptBackdrop'); }
   function openAppointment(id){
-    const a=state.appointments.find(x=>x.id===id); if(!a)return; resetAppt(); $('editId').value=a.id; $('date').value=a.date||''; $('time').value=a.time||''; $('type').value=a.type||'Visita técnica'; $('status').value=a.status||'Agendado'; $('client').value=a.client||''; $('city').value=a.city||''; $('technician').value=a.technician||''; $('vehicle').value=a.vehicle||''; $('equipment').value=a.equipment||''; $('order').value=a.order||''; $('notes').value=a.notes||''; $('apptTitle').textContent=canEdit()?'Editar agendamento':'Detalhes do agendamento'; setReadonly(!canEdit()); show('apptBackdrop');
+    const a=state.appointments.find(x=>x.id===id); if(!a)return; resetAppt(); $('editId').value=a.id; $('date').value=a.date||''; $('time').value=a.time||''; $('endTime').value=a.endTime||''; $('type').value=a.type||'Visita técnica'; $('status').value=a.status||'Agendado'; $('client').value=a.client||''; $('city').value=a.city||''; populateTechnicianSelect(a.technician||''); $('vehicle').value=a.vehicle||''; $('equipment').value=a.equipment||''; $('order').value=a.order||''; $('notes').value=a.notes||''; $('apptTitle').textContent=canEdit()?'Editar agendamento':'Detalhes do agendamento'; setReadonly(!canEdit()); show('apptBackdrop');
   }
 
   async function saveAppointment(){
     if(!canEdit())return; const client=$('client').value.trim(); if(!client){toast('Informe o cliente.');return;}
-    const data={date:$('date').value||'',time:$('time').value||'',type:$('type').value,status:$('status').value,client,city:$('city').value.trim(),technician:$('technician').value.trim(),vehicle:$('vehicle').value,equipment:$('equipment').value.trim(),order:$('order').value.trim(),notes:$('notes').value.trim(),deleted:false,updatedAt:FV.serverTimestamp(),updatedBy:state.user.uid};
+    const data={date:$('date').value||'',time:$('time').value||'',endTime:$('endTime').value||'',type:$('type').value,status:$('status').value,client,city:$('city').value.trim(),technician:$('technician').value,vehicle:$('vehicle').value,equipment:$('equipment').value.trim(),order:$('order').value.trim(),notes:$('notes').value.trim(),deleted:false,updatedAt:FV.serverTimestamp(),updatedBy:state.user.uid};
     try{ const id=$('editId').value; if(id) await db.collection('appointments').doc(id).update(data); else await db.collection('appointments').add({...data,createdAt:FV.serverTimestamp(),createdBy:state.user.uid}); hide('apptBackdrop'); toast(id?'Agendamento atualizado.':'Agendamento criado.'); }catch(e){console.error(e);toast('Erro ao salvar. Verifique sua permissão.');}
   }
   async function trashAppointment(){
@@ -265,19 +375,55 @@
   async function addAdmin(){ if(!isMaster())return; const uid=$('adminUid').value.trim(),name=$('adminName').value.trim(); if(!uid||!name){toast('Informe UID e nome.');return;} try{await db.collection('admins').doc(uid).set({role:'admin',active:true,name});$('adminUid').value='';$('adminName').value='';toast('Administrador adicionado.');await loadAdmins();}catch(e){console.error(e);toast('Erro ao adicionar administrador.');} }
   async function toggleAdmin(uid,isActive){ if(!isMaster())return; try{await db.collection('admins').doc(uid).update({role:'admin',active:!isActive});toast(!isActive?'Administrador ativado.':'Administrador desativado.');await loadAdmins();}catch(e){console.error(e);toast('Erro ao alterar administrador.');} }
 
+  function renderTechniciansAdmin(){
+    const rows=state.technicians;
+    $('techniciansList').innerHTML=rows.length?rows.map(t=>`<div class="admin-row"><div><div class="row-title">${esc(t.name||'Sem nome')}</div><div class="row-meta">${t.active===true?'Ativo e disponível para novos agendamentos':'Desativado'}</div></div><button class="btn toggle-tech" data-id="${t.id}" data-active="${t.active===true}">${t.active===true?'Desativar':'Ativar'}</button></div>`).join(''):'<div class="empty-state">Nenhum técnico cadastrado.</div>';
+    $('techniciansList').querySelectorAll('.toggle-tech').forEach(b=>b.addEventListener('click',()=>toggleTechnician(b.dataset.id,b.dataset.active==='true')));
+  }
+  async function addTechnician(){
+    if(!isMaster())return;
+    const name=$('techName').value.trim();
+    if(!name){toast('Informe o nome do técnico.');return;}
+    if(state.technicians.some(t=>(t.name||'').toLowerCase()===name.toLowerCase())){toast('Este técnico já está cadastrado.');return;}
+    try{await db.collection('technicians').add({name,active:true,createdAt:FV.serverTimestamp(),createdBy:state.user.uid});$('techName').value='';toast('Técnico adicionado.');}catch(e){console.error(e);toast('Erro ao adicionar técnico. Verifique as regras do Firestore.');}
+  }
+  async function toggleTechnician(id,isActive){
+    if(!isMaster())return;
+    try{await db.collection('technicians').doc(id).update({active:!isActive,updatedAt:FV.serverTimestamp(),updatedBy:state.user.uid});toast(!isActive?'Técnico ativado.':'Técnico desativado.');}catch(e){console.error(e);toast('Erro ao alterar técnico.');}
+  }
+  async function importExistingTechnicians(){
+    if(!isMaster())return;
+    const existing=new Set(state.technicians.map(t=>(t.name||'').trim().toLowerCase()));
+    const names=[...new Set(state.appointments.map(a=>(a.technician||'').trim()).filter(Boolean))].filter(n=>!existing.has(n.toLowerCase()));
+    if(!names.length){toast('Não há novos nomes para importar.');return;}
+    try{
+      const batch=db.batch();
+      names.forEach(name=>{const ref=db.collection('technicians').doc();batch.set(ref,{name,active:true,createdAt:FV.serverTimestamp(),createdBy:state.user.uid});});
+      await batch.commit(); toast(`${names.length} técnico(s) importado(s).`);
+    }catch(e){console.error(e);toast('Erro ao importar técnicos.');}
+  }
+
   async function login(){ $('loginError').textContent=''; try{await auth.signInWithEmailAndPassword($('loginEmail').value.trim(),$('loginPassword').value);$('loginPassword').value='';hide('loginBackdrop');toast('Login realizado.');}catch(e){console.error(e);$('loginError').textContent='E-mail ou senha inválidos, ou acesso não autorizado.';} }
 
   $('newBtn').addEventListener('click',()=>openNew()); $('saveBtn').addEventListener('click',saveAppointment); $('deleteBtn').addEventListener('click',trashAppointment);
   $('loginBtn').addEventListener('click',async()=>{if(state.user){await auth.signOut();toast('Sessão encerrada.');}else show('loginBackdrop');}); $('doLogin').addEventListener('click',login); $('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
-  $('masterBtn').addEventListener('click',openMaster); $('addAdminBtn').addEventListener('click',addAdmin);
+  $('masterBtn').addEventListener('click',openMaster); $('addAdminBtn').addEventListener('click',addAdmin); $('addTechBtn').addEventListener('click',addTechnician); $('importTechBtn').addEventListener('click',importExistingTechnicians);
   document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>hide(b.dataset.close))); document.querySelectorAll('.modal-backdrop').forEach(x=>x.addEventListener('click',e=>{if(e.target===x)hide(x.id);}));
-  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',async()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');const admins=t.dataset.tab==='admins';$('trashTab').style.display=admins?'none':'';$('adminsTab').style.display=admins?'':'none';if(admins)await loadAdmins();else await loadTrash();}));
-  $('prevBtn').addEventListener('click',()=>{if(state.view==='week')state.referenceDate.setDate(state.referenceDate.getDate()-7);else state.referenceDate.setMonth(state.referenceDate.getMonth()-1);state.referenceDate=new Date(state.referenceDate);render();});
-  $('nextBtn').addEventListener('click',()=>{if(state.view==='week')state.referenceDate.setDate(state.referenceDate.getDate()+7);else state.referenceDate.setMonth(state.referenceDate.getMonth()+1);state.referenceDate=new Date(state.referenceDate);render();});
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',async()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
+    const tab=t.dataset.tab; $('trashTab').style.display=tab==='trash'?'':'none'; $('adminsTab').style.display=tab==='admins'?'':'none'; $('techniciansTab').style.display=tab==='technicians'?'':'none';
+    if(tab==='admins') await loadAdmins(); else if(tab==='technicians') renderTechniciansAdmin(); else await loadTrash();
+  }));
+  $('prevBtn').addEventListener('click',()=>{if(state.view==='month')state.referenceDate.setMonth(state.referenceDate.getMonth()-1);else state.referenceDate.setDate(state.referenceDate.getDate()-7);state.referenceDate=new Date(state.referenceDate);render();});
+  $('nextBtn').addEventListener('click',()=>{if(state.view==='month')state.referenceDate.setMonth(state.referenceDate.getMonth()+1);else state.referenceDate.setDate(state.referenceDate.getDate()+7);state.referenceDate=new Date(state.referenceDate);render();});
   $('todayBtn').addEventListener('click',()=>{state.referenceDate=new Date();render();}); document.querySelectorAll('.view-switch button').forEach(b=>b.addEventListener('click',()=>{state.view=b.dataset.view;render();}));
+  ['filterTechnician','filterVehicle','filterType','filterStatus'].forEach(id=>$(id).addEventListener('change',()=>{
+    state.filters.technician=$('filterTechnician').value; state.filters.vehicle=$('filterVehicle').value; state.filters.type=$('filterType').value; state.filters.status=$('filterStatus').value; render();
+  }));
+  $('clearFiltersBtn').addEventListener('click',()=>{['filterTechnician','filterVehicle','filterType','filterStatus'].forEach(id=>$(id).value='');state.filters={technician:'',vehicle:'',type:'',status:''};render();});
   $('searchBtn').addEventListener('click',()=>{const term=prompt('Buscar por cliente, técnico, cidade, equipamento, pedido/OS ou observação:');if(!term)return;const q=term.toLowerCase();const r=state.appointments.filter(a=>Object.values(a).some(v=>String(v??'').toLowerCase().includes(q))).sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));if(!r.length){alert('Nenhum agendamento encontrado.');return;}if(r[0].date)state.referenceDate=parseISO(r[0].date);state.view='week';render();setTimeout(()=>openAppointment(r[0].id),80);});
 
-  connectAppointments(); updateAccessUI(); render();
+  connectAppointments(); connectTechnicians(); updateAccessUI(); populateTechnicianFilter(); populateTechnicianSelect(''); render();
 </script>
 </body>
 </html>
