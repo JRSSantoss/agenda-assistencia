@@ -40,7 +40,7 @@
     .tech-board-wrap{overflow-x:auto}.tech-board{min-width:980px}.tech-grid-head,.tech-row-grid{display:grid;grid-template-columns:170px repeat(5,minmax(150px,1fr))}
     .tech-grid-head{background:var(--surface2);border-bottom:1px solid var(--line)}.tech-grid-head>div{padding:10px;border-right:1px solid var(--line);font-size:10px;text-transform:uppercase;font-weight:900;color:var(--muted);text-align:center}.tech-grid-head>div:first-child{text-align:left}.tech-grid-head>div:last-child{border-right:0}
     .tech-row-grid{border-bottom:1px solid var(--line);min-height:115px}.tech-row-grid:last-child{border-bottom:0}.tech-name-cell{padding:12px;border-right:1px solid var(--line);background:#fafbfc}.tech-name-cell strong{display:block;font-size:13px}.tech-name-cell small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
-    .tech-day-cell{padding:7px;border-right:1px solid var(--line);min-height:115px}.tech-day-cell:last-child{border-right:0}.tech-mini{border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:8px;padding:7px;margin-bottom:6px;background:#fff;cursor:pointer}.tech-mini:hover{background:#fafcff}.tech-mini-time{font-size:10px;font-weight:900}.tech-mini-client{font-size:11px;font-weight:800;margin-top:2px}.tech-mini-meta{font-size:9px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tech-day-cell{padding:7px;border-right:1px solid var(--line);min-height:115px}.tech-day-cell:last-child{border-right:0}.tech-mini{border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:8px;padding:7px;margin-bottom:6px;background:#fff;cursor:pointer}.tech-mini:hover{background:#fafcff}.tech-mini-time{font-size:10px;font-weight:900}.tech-mini-client{font-size:11px;font-weight:800;margin-top:2px}.tech-mini-meta{font-size:9px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.vehicle-free{border:1px dashed #abefc6;border-radius:8px;padding:10px 8px;background:#ecfdf3;color:#067647;font-size:11px;font-weight:800;text-align:center}
     .tech-admin-actions{display:flex;gap:7px;flex-wrap:wrap}.tech-status{font-size:10px;font-weight:800;color:var(--muted)}
     @media(max-width:1100px){.layout{grid-template-columns:1fr}.side-panel{position:static}.summary-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:700px){.topbar{padding:12px}.container{padding:12px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.period-title{min-width:155px;font-size:14px}.month-day{min-height:85px;padding:5px}.month-item{display:none}.summary-grid{grid-template-columns:1fr 1fr}.admin-form{grid-template-columns:1fr}.day-body{height:500px}}
@@ -71,7 +71,7 @@
 
     <section class="toolbar">
       <div class="date-nav"><button class="btn btn-icon" id="prevBtn">‹</button><div class="period-title" id="periodTitle"></div><button class="btn btn-icon" id="nextBtn">›</button><button class="btn" id="todayBtn">Hoje</button></div>
-      <div class="view-switch"><button data-view="week" class="active">Semana</button><button data-view="month">Mês</button><button data-view="technicians">Técnicos</button></div>
+      <div class="view-switch"><button data-view="week" class="active">Semana</button><button data-view="month">Mês</button><button data-view="technicians">Técnicos</button><button data-view="vehicles">Carros</button></div>
     </section>
 
     <section class="filters-bar">
@@ -345,7 +345,8 @@
     document.querySelectorAll('.view-switch button').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
     if(state.view==='week'){ renderWeek(); $('sidePanel').style.display=''; }
     else if(state.view==='month'){ renderMonth(); $('sidePanel').style.display='none'; }
-    else { renderTechniciansView(); $('sidePanel').style.display='none'; }
+    else if(state.view==='technicians'){ renderTechniciansView(); $('sidePanel').style.display='none'; }
+    else { renderVehiclesView(); $('sidePanel').style.display='none'; }
     renderSummary(); renderUnassigned();
   }
 
@@ -399,6 +400,37 @@
           const iso=localISO(d);
           const list=week.filter(a=>a.date===iso&&(isUnassigned?!a.technician:a.technician===name)).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
           html+=`<div class="tech-day-cell">${list.map(a=>`<div class="tech-mini" data-id="${a.id}"><div class="tech-mini-time">${esc(a.time||'Horário pendente')}</div><div class="tech-mini-client">${esc(a.client||'Sem cliente')}</div><div class="tech-mini-meta">${esc(a.city||'')}${a.vehicle?` · 🚗 ${esc(a.vehicle)}`:''}</div></div>`).join('')}</div>`;
+        }
+        html+='</div>';
+      }
+    }
+    html+='</div></div>';
+    $('calendar').innerHTML=html;
+    $('calendar').querySelectorAll('.tech-mini').forEach(x=>x.addEventListener('click',()=>openAppointment(x.dataset.id)));
+  }
+
+
+  function renderVehiclesView(){
+    const mon=startOfWeek(state.referenceDate), fri=new Date(mon); fri.setDate(fri.getDate()+4);
+    $('periodTitle').textContent=`Semana ${fmt(mon,{day:'2-digit'})}–${fmt(fri,{day:'2-digit',month:'short',year:'numeric'})}`.replace('.','');
+    const week=filteredAppointments().filter(a=>a.date&&parseISO(a.date)>=mon&&parseISO(a.date)<=fri);
+    const allVehicles=['ONIX - FTK 0I92','ONIX - GCJ 6H84','ONIX - STE 0A73','ONIX - SUR 2C45','ONIX - SWJ 6E71'];
+    let vehicles=state.filters.vehicle ? allVehicles.filter(v=>v===state.filters.vehicle) : allVehicles.slice();
+    const days=[];
+    for(let i=0;i<5;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);days.push(d);}
+    let html='<div class="tech-board-wrap"><div class="tech-board"><div class="tech-grid-head"><div>Carro</div>'+days.map(d=>`<div>${fmt(d,{weekday:'short'})}<br>${fmt(d,{day:'2-digit',month:'2-digit'})}</div>`).join('')+'</div>';
+    if(!vehicles.length){
+      html+='<div class="empty-state">Nenhum carro encontrado para o filtro selecionado.</div>';
+    } else {
+      for(const vehicle of vehicles){
+        const total=week.filter(a=>(a.vehicle||'')===vehicle).length;
+        const bookedDays=days.filter(d=>week.some(a=>a.date===localISO(d)&&(a.vehicle||'')===vehicle)).length;
+        const freeDays=days.length-bookedDays;
+        html+=`<div class="tech-row-grid"><div class="tech-name-cell"><strong>${esc(vehicle)}</strong><small>${total} compromisso(s) · ${freeDays} dia(s) disponível(eis)</small></div>`;
+        for(const d of days){
+          const iso=localISO(d);
+          const list=week.filter(a=>a.date===iso&&(a.vehicle||'')===vehicle).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+          html+=`<div class="tech-day-cell">${list.length?list.map(a=>`<div class="tech-mini" data-id="${a.id}"><div class="tech-mini-time">${esc(a.time||'Horário pendente')}</div><div class="tech-mini-client">${esc(a.client||'Sem cliente')}</div><div class="tech-mini-meta">${esc(a.technician||'Sem técnico')}${a.city?` · ${esc(a.city)}`:''}</div></div>`).join(''):'<div class="vehicle-free">Disponível</div>'}</div>`;
         }
         html+='</div>';
       }
