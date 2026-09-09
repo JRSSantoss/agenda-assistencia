@@ -135,7 +135,7 @@
     </section>
     <section id="techniciansTab" style="display:none"><p class="helper">Cadastre aqui os técnicos que poderão ser selecionados nos agendamentos. Técnicos desativados continuam aparecendo nos registros antigos, mas deixam de aparecer para novos agendamentos.</p>
       <div class="admin-form"><div class="field"><label>Nome do técnico</label><input id="techName" placeholder="Nome completo"></div><div></div><button class="btn btn-primary" id="addTechBtn">Adicionar técnico</button></div>
-      <div class="tech-admin-actions"><button class="btn" id="importTechBtn">Importar nomes já usados na agenda</button></div>
+      
       <div id="techniciansList" style="margin-top:10px"></div>
     </section>
     <section id="excel2026Tab" style="display:none">
@@ -285,18 +285,19 @@
     return true;
   }
 
-  function technicianNames(includeInactiveUsed=true){
-    const set=new Set(state.technicians.filter(t=>t.active===true).map(t=>t.name).filter(Boolean));
-    if(includeInactiveUsed) state.appointments.forEach(a=>{ if(a.technician) set.add(a.technician); });
-    return [...set].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  function technicianNames(){
+    return state.technicians
+      .filter(t=>t.active===true && t.name)
+      .map(t=>t.name)
+      .sort((a,b)=>a.localeCompare(b,'pt-BR'));
   }
   function populateTechnicianFilter(){
     const current=$('filterTechnician').value;
-    $('filterTechnician').innerHTML='<option value="">Todos os técnicos</option>'+technicianNames(true).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+    $('filterTechnician').innerHTML='<option value="">Todos os técnicos</option>'+technicianNames().map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
     $('filterTechnician').value=current;
   }
   function populateTechnicianSelect(current=''){
-    const names=technicianNames(false);
+    const names=technicianNames();
     if(current && !names.includes(current)) names.push(current);
     names.sort((a,b)=>a.localeCompare(b,'pt-BR'));
     $('technician').innerHTML='<option value="">Selecione o técnico</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
@@ -392,9 +393,10 @@
     $('periodTitle').textContent=`Semana ${fmt(mon,{day:'2-digit'})}–${fmt(fri,{day:'2-digit',month:'short',year:'numeric'})}`.replace('.','');
     const all=filteredAppointments();
     const week=all.filter(a=>a.date&&parseISO(a.date)>=mon&&parseISO(a.date)<=fri);
-    let names=technicianNames(true);
+    let names=technicianNames();
     if(state.filters.technician) names=names.filter(n=>n===state.filters.technician);
-    const hasUnassigned=week.some(a=>!a.technician);
+    const officialNames=new Set(names);
+    const hasUnassigned=week.some(a=>!a.technician || !officialNames.has(a.technician));
     if(hasUnassigned && !state.filters.technician) names.push('Sem técnico');
     const days=[];
     for(let i=0;i<5;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);days.push(d);}
@@ -404,11 +406,12 @@
     } else {
       for(const name of names){
         const isUnassigned=name==='Sem técnico';
-        const total=week.filter(a=>isUnassigned?!a.technician:a.technician===name).length;
+        const officialSet=new Set(technicianNames());
+        const total=week.filter(a=>isUnassigned?(!a.technician || !officialSet.has(a.technician)):a.technician===name).length;
         html+=`<div class="tech-row-grid"><div class="tech-name-cell"><strong>${esc(name)}</strong><small>${total} compromisso(s) na semana</small></div>`;
         for(const d of days){
           const iso=localISO(d);
-          const list=week.filter(a=>a.date===iso&&(isUnassigned?!a.technician:a.technician===name)).sort((a,b)=>(a.time||'07:00').localeCompare(b.time||'07:00'));
+          const list=week.filter(a=>a.date===iso&&(isUnassigned?(!a.technician || !officialSet.has(a.technician)):a.technician===name)).sort((a,b)=>(a.time||'07:00').localeCompare(b.time||'07:00'));
           html+=`<div class="tech-day-cell">${list.map(a=>`<div class="tech-mini" data-id="${a.id}"><div class="tech-mini-time">${esc(a.time||'07:00')}</div><div class="tech-mini-client">${esc(a.client||'Sem cliente')}</div><div class="tech-mini-meta">${esc(a.city||'')}${a.vehicle?` · 🚗 ${esc(a.vehicle)}`:''}</div></div>`).join('')}</div>`;
         }
         html+='</div>';
@@ -561,7 +564,7 @@
 
   $('newBtn').addEventListener('click',()=>openNew()); $('saveBtn').addEventListener('click',saveAppointment); $('deleteBtn').addEventListener('click',trashAppointment);
   $('loginBtn').addEventListener('click',async()=>{if(state.user){await auth.signOut();toast('Sessão encerrada.');}else show('loginBackdrop');}); $('doLogin').addEventListener('click',login); $('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
-  $('masterBtn').addEventListener('click',openMaster); $('addAdminBtn').addEventListener('click',addAdmin); $('addTechBtn').addEventListener('click',addTechnician); $('importTechBtn').addEventListener('click',importExistingTechnicians); $('importExcel2026Btn').addEventListener('click',importExcel2026);
+  $('masterBtn').addEventListener('click',openMaster); $('addAdminBtn').addEventListener('click',addAdmin); $('addTechBtn').addEventListener('click',addTechnician); $('importExcel2026Btn').addEventListener('click',importExcel2026);
   document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>hide(b.dataset.close))); document.querySelectorAll('.modal-backdrop').forEach(x=>x.addEventListener('click',e=>{if(e.target===x)hide(x.id);}));
   document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',async()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
